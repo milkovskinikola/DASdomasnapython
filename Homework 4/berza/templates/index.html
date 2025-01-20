@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Platform - Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            background-color: #f07b4b;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header button {
+            background-color: #e1653f;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .header button:hover {
+            background-color: #f07b4b;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .input-dropdown select {
+            padding: 12px 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: #f4f6f9;
+            outline: none;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        #show-info-btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #f07b4b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        #show-info-btn:hover {
+            background-color: #e1653f;
+        }
+
+        .error-msg {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Welcome to the Dashboard</h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <h2>Select Company</h2>
+        <div id="error-msg" class="error-msg" style="display:none;"></div>
+
+        <form id="dropdown-form">
+            <div class="input-dropdown">
+                <label for="dropdown">Select a Company</label>
+                <select id="dropdown" name="company" required>
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <button type="button" id="show-info-btn" onclick="showInfo()">Show Information</button>
+        </form>
+    </div>
+    <script>
+        fetch('/filter1')
+    .then(response => response.json())
+    .then(data => {
+        const companyDropdown = document.getElementById('dropdown');
+        data.result.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company; 
+            option.textContent = company;  
+            companyDropdown.appendChild(option);
+        });
+    })
+    .catch(error => console.error("error fetching companies:", error));
+
+    function getSessionToken(){
+        return document.cookie.split(';').find(cookie => cookie.trim().startsWith('user='))?.split('=')[1];
+    }
+    function showInfo(){
+        const selectedComapny = document.getElementById('dropdown').value;
+        if(!selectedComapny){
+            documnet.getElementById('error-msg').textContent = 'Please select a company';
+            document.getElementById('error-msg').style.display = 'block';
+            return;
+        }
+        document.getElementById('error-msg').style.display = 'none';
+
+        window.location.href = `/company_info/${selectedComapny}`;
+    }
+    async function logout(){
+        fetch('/auth/logout',{
+            method: 'POST',
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if(response.ok){
+                window.location.href= '/auth/login'
+            }
+        })
+        .catch(error => {
+            console.error('Error logging out:', error)
+        })
+    }
+    </script>
+</body>
+</html>
